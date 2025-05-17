@@ -29,7 +29,11 @@ struct MainTabView: View {
             }
             
             Tab("Account", systemImage: "person.crop.circle.fill") {
-                
+                ProfileView(onSignOut: {
+                    // Clear login credentials
+                    UserDefaults.standard.removeObject(forKey: "user_apiKey")
+                    UserDefaults.standard.removeObject(forKey: "user_email")
+                })
             }
             //.badge(2)
             

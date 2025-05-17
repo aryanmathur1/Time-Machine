@@ -138,8 +138,9 @@ struct LoginView: View {
                 if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                    let key = json["apiKey"] as? String {
                     
-                    // ✅ Save to AppStorage so GeminiView can access it
+                    // ✅ Save both API key and email to AppStorage (UserDefaults)
                     UserDefaults.standard.set(key, forKey: "user_apiKey")
+                    UserDefaults.standard.set(email, forKey: "user_email")
                     
                     DispatchQueue.main.async {
                         onLoginSuccess()
@@ -161,5 +162,6 @@ struct LoginView: View {
         
         isLoading = false
     }
+
 }
 
