@@ -8,14 +8,25 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var isAuthenticated = false
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        if isAuthenticated {
+            MainTabView()
+                .preferredColorScheme(.light)
+        } else {
+            LoginView(onLoginSuccess: {
+                isAuthenticated = true
+            })
+            .preferredColorScheme(.light)
+            .toolbar {
+                Text("Authentication")
+                    .font(.callout)
+                    .fontWeight(.regular)
+                    .textScale(.secondary)
+                    .foregroundStyle(.gray)
+            }
         }
-        .padding()
     }
 }
 
