@@ -40,17 +40,21 @@ struct TimeLoggerView: View {
                 }
                 .padding(.horizontal)
 
-                List(viewModel.log) { entry in
-                    VStack(alignment: .leading) {
-                        Text("📌 \(entry.category)")
-                            .font(.headline)
-                        Text("🕒 \(entry.start.formatted(date: .omitted, time: .shortened)) → \(entry.end.formatted(date: .omitted, time: .shortened))")
-                        Text("⏱ Duration: \(formatDuration(entry.duration))")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                List {
+                    ForEach(viewModel.log) { entry in
+                        VStack(alignment: .leading) {
+                            Text("📌 \(entry.category)")
+                                .font(.headline)
+                            Text("🕒 \(entry.start.formatted(date: .omitted, time: .shortened)) → \(entry.end.formatted(date: .omitted, time: .shortened))")
+                            Text("Duration: \(formatDuration(entry.duration))")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(.vertical, 5)
                     }
-                    .padding(.vertical, 5)
+                    .onDelete(perform: viewModel.deleteEntries) // 👈 Add this line
                 }
+
             }
             .navigationTitle("Time Capsule")
         }

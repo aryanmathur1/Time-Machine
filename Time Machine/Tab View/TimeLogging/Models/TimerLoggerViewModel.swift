@@ -138,5 +138,10 @@ class TimeLoggerViewModel: ObservableObject {
         }.resume()
     }
 
+    func deleteEntries(at offsets: IndexSet) {
+        log.remove(atOffsets: offsets)
+        saveLog()
+        saveLogToServer()
+    }
     
 }
