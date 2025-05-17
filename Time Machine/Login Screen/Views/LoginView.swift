@@ -111,7 +111,7 @@ struct LoginView: View {
     }
     
     private func performAuthRequest(endpoint: String, email: String, password: String) async {
-        guard let url = URL(string: "https://loginchatworthy.aryanrajmathur.workers.dev/\(endpoint)") else {
+        guard let url = URL(string: "https://timemachine.aryanrajmathur.workers.dev/\(endpoint)") else {
             errorMessage = "Invalid server URL"
             return
         }

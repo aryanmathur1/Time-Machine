@@ -8,12 +8,12 @@
 import SwiftUI
 
 struct MainTabView: View {
+    @Binding var isAuthenticated: Bool
+    
     var body: some View {
-        
         TabView {
-            
             Tab("Home", systemImage: "house") {
-                
+                // Home view here
             }
             
             Tab("Time Log", systemImage: "calendar.badge.clock") {
@@ -21,27 +21,21 @@ struct MainTabView: View {
             }
             
             Tab("Projection", systemImage: "sparkles") {
-                
+                // Projection view here
             }
             
             Tab("Time Energy", systemImage: "bolt") {
-                
+                // Energy view here
             }
             
             Tab("Account", systemImage: "person.crop.circle.fill") {
                 ProfileView(onSignOut: {
-                    // Clear login credentials
                     UserDefaults.standard.removeObject(forKey: "user_apiKey")
                     UserDefaults.standard.removeObject(forKey: "user_email")
+                    isAuthenticated = false // ⬅️ go back to login
                 })
             }
-            //.badge(2)
-            
         }
-        
     }
 }
 
-#Preview {
-    MainTabView()
-}

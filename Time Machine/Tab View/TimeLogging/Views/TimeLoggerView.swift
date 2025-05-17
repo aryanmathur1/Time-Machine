@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct TimeLoggerView: View {
+    
     @StateObject private var viewModel = TimeLoggerViewModel()
 
     var body: some View {
@@ -53,6 +54,7 @@ struct TimeLoggerView: View {
             }
             .navigationTitle("Time Capsule")
         }
+        
     }
 
     private func formatDuration(_ seconds: TimeInterval) -> String {
@@ -60,4 +62,5 @@ struct TimeLoggerView: View {
         let secs = Int(seconds) % 60
         return "\(mins)m \(secs)s"
     }
+
 }

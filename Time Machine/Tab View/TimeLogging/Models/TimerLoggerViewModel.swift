@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import SwiftUI
 
 class TimeLoggerViewModel: ObservableObject {
     @Published var selectedCategory: String = "Work"
@@ -16,6 +17,9 @@ class TimeLoggerViewModel: ObservableObject {
             saveLog()
         }
     }
+    
+    @AppStorage("user_email") private var email: String = ""
+    @AppStorage("user_apiKey") private var apiKey: String = ""
 
     private var startTime: Date?
     let categories = ["Work", "Study", "Rest", "Social Media", "Exercise"]
@@ -25,7 +29,8 @@ class TimeLoggerViewModel: ObservableObject {
         .appendingPathComponent("TimeLog.json")
 
     init() {
-        loadLog()
+        //loadLog()
+        loadLogFromServer() // ✅ pull remote log on launch
     }
 
     func startLogging() {
@@ -40,6 +45,8 @@ class TimeLoggerViewModel: ObservableObject {
         log.insert(entry, at: 0)
         isLogging = false
         startTime = nil
+        saveLog()
+        saveLogToServer() // ✅ save remotely
     }
 
     // MARK: - Save/Load
@@ -63,4 +70,73 @@ class TimeLoggerViewModel: ObservableObject {
             log = []
         }
     }
+    
+    func saveLogToServer() {
+        guard let url = URL(string: "https://timemachine.aryanrajmathur.workers.dev/log/save") else { return }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let body: [String: Any] = [
+            "email": email,
+            "apiKey": apiKey,
+            "log": log.map { entry in
+                [
+                    "id": entry.id.uuidString,
+                    "category": entry.category,
+                    "start": ISO8601DateFormatter().string(from: entry.start),
+                    "end": ISO8601DateFormatter().string(from: entry.end)
+                ]
+            }
+        ]
+        
+        print(body)
+
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+
+        URLSession.shared.dataTask(with: request).resume()
+    }
+
+    func loadLogFromServer() {
+        guard let url = URL(string: "https://timemachine.aryanrajmathur.workers.dev/log/load") else { return }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let body = ["email": email, "apiKey": apiKey]
+        request.httpBody = try? JSONEncoder().encode(body)
+
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            guard let data = data else { return }
+            do {
+                let raw = try JSONDecoder().decode([[String: String]].self, from: data)
+
+                let remoteLog: [TimeEntry] = raw.compactMap { dict in
+                    guard let idStr = dict["id"],
+                          let category = dict["category"],
+                          let startStr = dict["start"],
+                          let endStr = dict["end"],
+                          let start = ISO8601DateFormatter().date(from: startStr),
+                          let end = ISO8601DateFormatter().date(from: endStr),
+                          let id = UUID(uuidString: idStr) else {
+                        return nil
+                    }
+
+                    return TimeEntry(id: id, category: category, start: start, end: end)
+                }
+                print("📡 Server log: \(remoteLog)")
+
+                DispatchQueue.main.async {
+                    self.log = remoteLog // ✅ Replace local log with remote
+                }
+
+            } catch {
+                print("❌ Server log decode failed: \(error)")
+            }
+        }.resume()
+    }
+
+    
 }
