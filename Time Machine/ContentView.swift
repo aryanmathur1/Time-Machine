@@ -10,6 +10,7 @@ import SwiftUI // daniel says HI
 struct ContentView: View {
     @AppStorage("user_apiKey") private var apiKey: String?
     @State private var isAuthenticated = false
+    @State private var hasFinishedOnboarding: Bool = false
     
     var body: some View {
         Group {
@@ -17,16 +18,22 @@ struct ContentView: View {
                 MainTabView(isAuthenticated: $isAuthenticated)
                     .preferredColorScheme(.light)
             } else {
-                LoginView(onLoginSuccess: {
-                    isAuthenticated = true
-                })
-                .preferredColorScheme(.light)
-                .toolbar {
-                    Text("Authentication")
-                        .font(.callout)
-                        .fontWeight(.regular)
-                        .textScale(.secondary)
-                        .foregroundStyle(.gray)
+                if !hasFinishedOnboarding {
+                    IntroView {
+                        hasFinishedOnboarding = true
+                    }
+                } else {
+                    LoginView(onLoginSuccess: {
+                        isAuthenticated = true
+                    })
+                    .preferredColorScheme(.light)
+                    .toolbar {
+                        Text("Authentication")
+                            .font(.callout)
+                            .fontWeight(.regular)
+                            .textScale(.secondary)
+                            .foregroundStyle(.gray)
+                    }
                 }
             }
         }

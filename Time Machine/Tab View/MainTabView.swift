@@ -10,6 +10,9 @@ import SwiftUI
 struct MainTabView: View {
     @Binding var isAuthenticated: Bool
     
+    // Shared ViewModel
+    @StateObject private var timeLoggerViewModel = TimeLoggerViewModel()
+    
     var body: some View {
         TabView {
             Tab("Home", systemImage: "house") {
@@ -17,11 +20,11 @@ struct MainTabView: View {
             }
             
             Tab("Time Log", systemImage: "calendar.badge.clock") {
-                TimeLoggerView()
+                TimeLoggerView(viewModel: timeLoggerViewModel)
             }
             
             Tab("Projection", systemImage: "sparkles") {
-                // Projection view here
+                ProjectionView()
             }
             
             Tab("Time Energy", systemImage: "bolt") {
@@ -38,4 +41,3 @@ struct MainTabView: View {
         }
     }
 }
-

@@ -24,11 +24,20 @@ struct LoginView: View {
     var body: some View {
         ZStack {
             Color.pink.ignoresSafeArea()
+            
+            Image("IntroGradient")
+                .resizable()
+                .scaledToFill()
+                .opacity(1)
+                .ignoresSafeArea()
+            
+            Color.pink.opacity(0).ignoresSafeArea()
+            
+//            Circle()
+//                .scale(1.3)
+//                .foregroundColor(.white.opacity(0.15))
             Circle()
-                .scale(1.5)
-                .foregroundColor(.white.opacity(0.15))
-            Circle()
-                .scale(1.2)
+                .scale(0.9)
                 .foregroundColor(.white)
             
             VStack(spacing: 20) {
@@ -37,7 +46,7 @@ struct LoginView: View {
                     .bold()
                     .padding(.bottom)
                 
-                TextField("Email", text: $email)
+                TextField("Username", text: $email)
                     .autocorrectionDisabled(true)
                     .textInputAutocapitalization(.none)
                     .padding()
@@ -162,6 +171,6 @@ struct LoginView: View {
         
         isLoading = false
     }
-
+    
 }
 

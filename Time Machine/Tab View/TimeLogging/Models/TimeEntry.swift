@@ -7,11 +7,11 @@
 
 import Foundation
 
-struct TimeEntry: Identifiable, Codable {
+struct TimeEntry: Identifiable, Codable, Equatable {
     let id: UUID
-    let category: String
-    let start: Date
-    let end: Date
+    var category: String
+    var start: Date
+    var end: Date
 
     var duration: TimeInterval {
         end.timeIntervalSince(start)
