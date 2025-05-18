@@ -33,8 +33,6 @@ struct ProfileView: View {
                     .foregroundColor(.red)
             }
             
-            Spacer()
-            
             Button {
                 signOut()
             } label: {

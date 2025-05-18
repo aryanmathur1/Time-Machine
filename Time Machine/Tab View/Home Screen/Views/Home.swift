@@ -17,6 +17,7 @@ struct Home: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .center, spacing:12) {
+                Spacer()
                 HackerTextView(
                     text: "Hello \(email)!",
                     trigger: trigger,
@@ -30,7 +31,7 @@ struct Home: View {
                     trigger.toggle()
                 }
                 
-                Spacer(minLength: 20)
+                //Spacer(minLength: 20)
                 
                 CategoryTotalsGridView(viewModel: timeLoggerViewModel)
                     .padding(.top, 15)

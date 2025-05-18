@@ -380,7 +380,7 @@ class TimeLoggerViewModel: ObservableObject {
         }.resume()
     }
     
-    private let geminiTimelineKey = "geminiScenarios"
+    private let geminiTimelineKey = "geminiTimeline"
     
     func saveGeminiTimelineToStorage() {
         UserDefaults.standard.set(geminiTimeline, forKey: geminiTimelineKey)

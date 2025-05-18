@@ -26,6 +26,8 @@ struct TimeLoggerView: View {
         VStack {
             VStack(spacing: 20) {
                 Spacer(minLength: 10)
+                Text("Time Log")
+                    .font(.title.bold())
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
                         ForEach(viewModel.categories, id: \.self) { category in
@@ -117,7 +119,6 @@ struct TimeLoggerView: View {
                 }
                 
             }
-            .navigationTitle("Time Log")
         }
         .sheet(item: $selectedEntryForEdit) { entry in
             EditEntrySheet(
