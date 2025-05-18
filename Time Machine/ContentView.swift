@@ -5,7 +5,7 @@
 //  Created by Aryan Mathur on 5/17/25.
 //
 
-import SwiftUI // daniel says HI
+import SwiftUI // daniel says HI and Nandu says HI
 
 struct ContentView: View {
     @AppStorage("user_apiKey") private var apiKey: String?
