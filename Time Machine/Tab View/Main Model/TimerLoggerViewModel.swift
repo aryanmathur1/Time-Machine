@@ -22,8 +22,11 @@ class TimeLoggerViewModel: ObservableObject {
     @Published var geminiTips: [String] = []
     @Published var isLoadingGeminiTips = false
     @Published var isLoadingGeminiScenarios = false
+    @Published var isLoadingGeminiTimeline = false
     
     @Published var geminiScenarios: [String] = []
+    
+    @Published var geminiTimeline: [String] = []
     
     @AppStorage("user_email") private var email: String = ""
     @AppStorage("user_apiKey") private var apiKey: String = ""
@@ -75,6 +78,13 @@ class TimeLoggerViewModel: ObservableObject {
         } catch {
             print("⚠️ No existing log or failed to load: \(error.localizedDescription)")
             log = []
+        }
+    }
+    
+    func updateEntry(_ updatedEntry: TimeEntry) {
+        if let index = log.firstIndex(where: { $0.id == updatedEntry.id }) {
+            log[index] = updatedEntry
+            log = log  // Force SwiftUI to refresh views observing 'log'
         }
     }
     
@@ -211,11 +221,11 @@ class TimeLoggerViewModel: ObservableObject {
     }
     
     private let geminiTipsKey = "geminiTips"
-
+    
     func saveGeminiTipsToStorage() {
         UserDefaults.standard.set(geminiTips, forKey: geminiTipsKey)
     }
-
+    
     func loadGeminiTipsFromStorage() {
         if let saved = UserDefaults.standard.stringArray(forKey: geminiTipsKey) {
             self.geminiTips = saved
@@ -225,11 +235,11 @@ class TimeLoggerViewModel: ObservableObject {
     /// GEMINI SCENARIOS
     
     //private let geminiScenariosKey = "geminiScenarios"
-
+    
     func fetchGeminiScenarios(email: String, apiKey: String) {
         isLoadingGeminiScenarios = true
         loadLogFromServer()
-
+        
         let prompt = """
         IN BULLET POINTS JUST RESPONSE NO "Okay let's do it!" just the response. Based on the given time log, generate:
         You are a fortune teller predicting someone's future. Predict their Family, happiness out of 10, etc. Make the responses formatted as a paragraph without any other text such as titles. In the prompt, when I reference you, I mean the person who you are judging.
@@ -237,19 +247,19 @@ class TimeLoggerViewModel: ObservableObject {
         - Another paragraph about your future self *if you keep your current habits*.
         - Another paragraph about your future self *if your habits worsen*.
         - Another paragraph about your future self *if your habits improve*.
-
+        
         Time log:
         \(log.map {
             "\($0.category): \($0.start.formatted(date: .abbreviated, time: .shortened)) - \($0.end.formatted(date: .abbreviated, time: .shortened)) (\(Int($0.duration / 60)) minutes)"
         }.joined(separator: "\n"))
         """
-
+        
         guard let url = URL(string: "https://timemachine.aryanrajmathur.workers.dev/gemini") else { return }
-
+        
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
+        
         let body: [String: Any] = [
             "contents": [
                 [
@@ -259,14 +269,14 @@ class TimeLoggerViewModel: ObservableObject {
                 ]
             ]
         ]
-
+        
         request.httpBody = try? JSONSerialization.data(withJSONObject: body)
-
+        
         URLSession.shared.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
                 self.isLoadingGeminiScenarios = false
             }
-
+            
             guard let data = data,
                   let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                   let candidates = json["candidates"] as? [[String: Any]],
@@ -275,12 +285,12 @@ class TimeLoggerViewModel: ObservableObject {
                   let text = parts.first?["text"] as? String else {
                 return
             }
-
+            
             let parsedScenarios = text
                 .components(separatedBy: .newlines)
                 .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
                 .filter { !$0.isEmpty }
-
+            
             DispatchQueue.main.async {
                 self.geminiScenarios = parsedScenarios
                 self.saveGeminiScenariosToStorage()
@@ -289,15 +299,97 @@ class TimeLoggerViewModel: ObservableObject {
     }
     
     private let geminiScenariosKey = "geminiScenarios"
-
+    
     func saveGeminiScenariosToStorage() {
         UserDefaults.standard.set(geminiScenarios, forKey: geminiScenariosKey)
     }
-
+    
     func loadGeminiScenariosFromStorage() {
         if let saved = UserDefaults.standard.stringArray(forKey: geminiScenariosKey) {
             self.geminiScenarios = saved
         }
     }
-
+    
+    /// GEMINI TIMELINE:
+    //private let geminiScenariosKey = "geminiScenarios"
+    
+    @AppStorage("wheelPickerValueAge") private var storedAge: Double = 0
+    
+    func fetchGeminiTimeline(email: String, apiKey: String) {
+        isLoadingGeminiTimeline = true
+        loadLogFromServer()
+        
+        let prompt = """
+        IN BULLET POINTS JUST RESPONSE NO "Okay let's do it!" just the response. Based on the given time log, generate:
+        You are a fortune teller predicting someone's future who is \(Int(storedAge)) years old. Predict their Family, happiness out of 10, etc.In the prompt, when I reference you, I mean the person who you are judging.
+        - A paragraph about your current self *if you keep your current habits*.
+        - Another paragraph about your future self 5 yrs from now *if you keep your current habits*.
+        - Another paragraph about your future self 10 yrs from now *if you keep your current habits*.
+        - Another paragraph about your future self 20 yrs from now *if you keep your current habits*.
+        
+        Format each 'paragraph' like this, and add emojis for visuals. This should be one continuous paragraph, only line breaks are between paragraphs. In the example below, **bold** means to make that specific text bold in formatting.:
+        " **<insert> Years from now**, <insert> years old. Happiness: <insert>/10. Family: <insert status>. Work: <insert job and relations>. Positives: <insert>. Negatives: <insert>. <any extra info>"
+        
+        Time log:
+        \(log.map {
+            "\($0.category): \($0.start.formatted(date: .abbreviated, time: .shortened)) - \($0.end.formatted(date: .abbreviated, time: .shortened)) (\(Int($0.duration / 60)) minutes)"
+        }.joined(separator: "\n"))
+        """
+        
+        guard let url = URL(string: "https://timemachine.aryanrajmathur.workers.dev/gemini") else { return }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let body: [String: Any] = [
+            "contents": [
+                [
+                    "parts": [
+                        ["text": prompt]
+                    ]
+                ]
+            ]
+        ]
+        
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            DispatchQueue.main.async {
+                self.isLoadingGeminiTimeline = false
+            }
+            
+            guard let data = data,
+                  let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let candidates = json["candidates"] as? [[String: Any]],
+                  let content = candidates.first?["content"] as? [String: Any],
+                  let parts = content["parts"] as? [[String: Any]],
+                  let text = parts.first?["text"] as? String else {
+                return
+            }
+            
+            let parsedScenarios = text
+                .components(separatedBy: .newlines)
+                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                .filter { !$0.isEmpty }
+            
+            DispatchQueue.main.async {
+                self.geminiTimeline = parsedScenarios
+                self.saveGeminiTimelineToStorage()
+            }
+        }.resume()
+    }
+    
+    private let geminiTimelineKey = "geminiScenarios"
+    
+    func saveGeminiTimelineToStorage() {
+        UserDefaults.standard.set(geminiTimeline, forKey: geminiTimelineKey)
+    }
+    
+    func loadGeminiTimelineFromStorage() {
+        if let saved = UserDefaults.standard.stringArray(forKey: geminiTimelineKey) {
+            self.geminiTimeline = saved
+        }
+    }
+    
 }

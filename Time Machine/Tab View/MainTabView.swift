@@ -16,7 +16,7 @@ struct MainTabView: View {
     var body: some View {
         TabView {
             Tab("Home", systemImage: "house") {
-                // Home view here
+                Home()
             }
             
             Tab("Time Log", systemImage: "calendar.badge.clock") {
@@ -27,9 +27,9 @@ struct MainTabView: View {
                 ProjectionView()
             }
             
-            Tab("Time Energy", systemImage: "bolt") {
-                // Energy view here
-            }
+//            Tab("Time Energy", systemImage: "bolt") {
+//                // Energy view here
+//            }
             
             Tab("Account", systemImage: "person.crop.circle.fill") {
                 ProfileView(onSignOut: {

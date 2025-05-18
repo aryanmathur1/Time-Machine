@@ -23,7 +23,7 @@ struct TimeLoggerView: View {
     @State private var startTime: Date?
     
     var body: some View {
-        NavigationView {
+        VStack {
             VStack(spacing: 20) {
                 Spacer(minLength: 10)
                 ScrollView(.horizontal, showsIndicators: false) {

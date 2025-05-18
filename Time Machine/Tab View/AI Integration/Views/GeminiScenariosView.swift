@@ -103,6 +103,7 @@ struct GeminiScenariosView: View {
 
     private func refreshScenarios() {
         startSpinning()
+        viewModel.loadLogFromServer()
         viewModel.fetchGeminiScenarios(email: email, apiKey: apiKey)
     }
 

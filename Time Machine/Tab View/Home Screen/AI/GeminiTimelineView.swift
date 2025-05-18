@@ -1,18 +1,18 @@
 //
-//  GeminiTipsView.swift
+//  GeminiTimelineView.swift
 //  Time Machine
 //
-//  Created by Aryan Mathur on 5/17/25.
+//  Created by Aryan Mathur on 5/18/25.
 //
 
 import SwiftUI
 
-struct GeminiTipsView: View {
+struct GeminiTimelineView: View {
     @ObservedObject var viewModel: TimeLoggerViewModel
     @Environment(\.colorScheme) private var colorScheme
 
     @State private var rotation: Double = 0
-    @State private var isExpanded: Bool = false
+    @State private var isExpanded: Bool = true
     
     @AppStorage("user_email") private var email: String = ""
     @AppStorage("user_apiKey") private var apiKey: String = ""
@@ -23,7 +23,7 @@ struct GeminiTipsView: View {
         VStack(alignment: .leading, spacing: 16) {
             // Header with refresh button
             HStack {
-                Text("🧠 Productivity Tips")
+                Text("⏰ Timeline of you")
                     .font(.title3.bold())
                     .foregroundColor(colorScheme == .dark ? .white : .black)
 
@@ -38,38 +38,46 @@ struct GeminiTipsView: View {
                         .rotationEffect(.degrees(rotation))
                 }
                 .buttonStyle(.plain)
-                .disabled(viewModel.isLoadingGeminiTips)
+                .disabled(viewModel.isLoadingGeminiTimeline)
             }
 
-            if viewModel.isLoadingGeminiTips {
+            if viewModel.isLoadingGeminiTimeline {
                 loadingAnimation()
-            } else if viewModel.geminiTips.isEmpty {
-                Text("No tips available. Try generating tips!")
+            } else if viewModel.geminiTimeline.isEmpty {
+                Text("No timeline available. Try generating a timeline!")
                     .foregroundColor(.secondary)
             } else {
-                ForEach(displayedTips, id: \.self) { tip in
-                    formattedTip(tip)
-                        .font(.body)
-                        .foregroundColor(Color.black )
-                        .padding()
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(colorScheme == .dark ? Color.white.opacity(0.1) : Color.gray.opacity(0.1))
-                        )
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        ForEach(displayedTips, id: \.self) { tip in
+                            VStack(alignment: .leading, spacing: 4) {
+                                formattedTip(tip)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                            .padding()
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(colorScheme == .dark ? Color.white.opacity(0.1) : Color.gray.opacity(0.1))
+                            )
+                            .frame(width: 250, alignment: .topLeading) // adjust width as needed
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                        }
+                    }
+                    .padding(.vertical, 4)
                 }
 
-                Button {
-                    withAnimation {
-                        isExpanded.toggle()
-                    }
-                } label: {
-                    Text(isExpanded ? "See Less" : "See More")
-                        .font(.subheadline.bold())
-                        .foregroundColor(Color.accentColor)
-                }
-                .buttonStyle(.plain)
-                .padding(.top, 8)
+
+//                Button {
+//                    withAnimation {
+//                        isExpanded.toggle()
+//                    }
+//                } label: {
+//                    Text(isExpanded ? "See Less" : "See More")
+//                        .font(.subheadline.bold())
+//                        .foregroundColor(Color.accentColor)
+//                }
+//                .buttonStyle(.plain)
+//                .padding(.top, 8)
             }
         }
         .padding()
@@ -78,7 +86,7 @@ struct GeminiTipsView: View {
                 .fill(colorScheme == .dark ? Color.black.opacity(0.6) : Color.white.opacity(0.6))
         )
         .padding(.horizontal)
-        .onChange(of: viewModel.isLoadingGeminiTips) { isLoading in
+        .onChange(of: viewModel.isLoadingGeminiTimeline) { isLoading in
             if isLoading {
                 startSpinning()
             } else {
@@ -86,18 +94,18 @@ struct GeminiTipsView: View {
             }
         }
         .onAppear {
-            viewModel.loadGeminiTipsFromStorage()
+            viewModel.loadGeminiTimelineFromStorage()
         }
     }
 
     private var displayedTips: [String] {
-        isExpanded ? viewModel.geminiTips : Array(viewModel.geminiTips.prefix(1))
+        isExpanded ? viewModel.geminiTimeline : Array(viewModel.geminiTimeline.prefix(1))
     }
 
     private func refreshTips() {
         startSpinning()
         viewModel.loadLogFromServer()
-        viewModel.fetchGeminiTips(email: email, apiKey: apiKey)
+        viewModel.fetchGeminiTimeline(email: email, apiKey: apiKey)
     }
     
     private func startSpinning() {
@@ -118,7 +126,7 @@ struct GeminiTipsView: View {
     @ViewBuilder
     private func loadingAnimation() -> some View {
         VStack(spacing: 12) {
-            Image(systemName: "lightbulb.circle.fill")
+            Image(systemName: "clock.circle.fill")
                 .font(.system(size: 40))
                 .foregroundColor(.accentColor)
                 .rotationEffect(.degrees(rotation))
@@ -127,7 +135,7 @@ struct GeminiTipsView: View {
                     rotation = 360
                 }
 
-            Text("Generating smart tips...")
+            Text("Predicting your future...")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
         }
@@ -191,3 +199,4 @@ struct GeminiTipsView: View {
     }
 
 }
+
