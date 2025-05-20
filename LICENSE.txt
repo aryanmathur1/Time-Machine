@@ -1,0 +1,5 @@
+All rights reserved.
+
+Copyright (c) 2025 Aryan Mathur, Daniel Xiao, Srinandasai Ari.
+
+This software is proprietary and confidential. No part of this application may be reproduced, distributed, or transmitted in any form or by any means without prior written permission of the developers.
