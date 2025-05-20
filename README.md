@@ -4,6 +4,12 @@
 
 ---
 
+## 🏆 Awards
+
+This application was initially created for the Academies of Loudoun's 2025 AcademiesHacks Hackathon. We placed 2nd best overall hack, and won a Nintendo Switch Lite for each team member!
+
+---
+
 ## ✨ Inspiration
 
 Time management has become an increasingly major problem in the 21st century. Missed deadlines, low-quality work, and rising stress levels are symptoms of disorganized routines and poor time allocation. We wanted to help people regain control.
