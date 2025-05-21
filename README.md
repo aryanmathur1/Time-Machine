@@ -6,7 +6,7 @@
 
 ## 🏆 Awards
 
-This application was initially created for the Academies of Loudoun's 2025 AcademiesHacks Hackathon. We placed 2nd best overall hack, and won a Nintendo Switch Lite for each team member!
+This application was initially created for the Academies of Loudoun's 2025 AcademiesHacks Hackathon. We placed 2nd best overall hack, and each team member won a Nintendo Switch Lite!
 
 ---
 
@@ -57,7 +57,7 @@ We used:
 
 * **Aryan Mathur** – Project Manager, Lead Developer & Marketing
 * **Daniel Xiao** – Developer & Lead in Marketing
-* **Srinandasai Ari** – Developer & Marketing
+* **Srinandasai Ari** – Ideation, Developer & Marketing
 
 ---
 
